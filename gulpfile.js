@@ -24,7 +24,7 @@ var paths = {
     'node_modules/normalize.css/normalize.css',
     'node_modules/bootstrap/dist/css/bootstrap*(|-theme).css',
     'node_modules/font-awesome/css/font-awesome.css',
-    'node_modules/gulpfile-ninecms/css/style.css'
+    'node_modules/gulpfile-ninecms/style.css'
     //'static/myproject/extend.css'
   ],
   js: [

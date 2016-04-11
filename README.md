@@ -1,7 +1,9 @@
 Gulpfile-Ninecms
 ================
 
-Front-end package management for [NineCMS](https://github.com/Wtower/django-ninecms)
+Front-end package management for [NineCMS](https://github.com/Wtower/django-ninecms).
+
+The gulpfile can be used for any web site including but not limited to sites built with NineCMS.
 
 Contents
 --------
@@ -14,6 +16,7 @@ Contents
 - [Background](#background)
 - [Browserify](#browserify)
 - [Useful links](#useful-links)
+- [Additional features](#additional-features)
 
 Objectives
 ----------
@@ -127,7 +130,13 @@ Several other possibilities have been evaluated and rejected:
 Browserify
 ----------
 
-Browserify the following in js examples:
+Example of `index.js` file using browserify:
+
+    $ = jQuery = require('jquery');
+    require('bootstrap');
+    require('lightbox2');
+
+:todo: Browserify the following for the example above:
 
 - [jQuery](http://rkulla.blogspot.gr/2014/04/using-browserify-with-jquery-backbonejs.html)
 - [jQuery plugins](http://blog.npmjs.org/post/112064849860/using-jquery-plugins-with-npm) (eg. scrollTo)
@@ -157,3 +166,17 @@ Useful links on setting up a gulpfile
 - http://stackoverflow.com/questions/25713118/how-to-perform-multiple-gulp-commands-in-one-task
 - https://www.npmjs.com/package/gulp-image-resize
 - http://stackoverflow.com/questions/30372637/getting-started-with-browserify-import-local-files
+
+Additional features
+-------------------
+
+Apart from the gulpfile, the following is provided:
+
+- `index.js`: the main script for the package is the browserified version of the
+  [NineCMS `layout.js` file](https://github.com/Wtower/django-ninecms/blob/devel/ninecms/static/ninecms/layout.js).
+- `style.css`: the same stylesheet as 
+  [NineCMS `style.css` file](https://github.com/Wtower/django-ninecms/blob/devel/ninecms/static/ninecms/style.css).
+
+Example:
+
+    require('gulpfile-ninecms');

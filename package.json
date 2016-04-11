@@ -37,7 +37,7 @@
     "gulp-concat": "^2.6.0",
     "gulp-google-webfonts": "0.0.12",
     "gulp-if": "^2.0.0",
-    "gulp-image-resize": "^0.7.1",
+    "gulp-image-resize": "^0.8.0",
     "gulp-jshint": "^2.0.0",
     "gulp-less": "^3.0.5",
     "gulp-minify-css": "^1.2.4",
@@ -51,10 +51,9 @@
     "jshint": "^2.9.1",
     "jshint-stylish": "^2.1.0",
     "lightbox2": "^2.8.2",
-    "ninecms-front": "file:static/ninecms",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.7.0",
-    "yargs": "^4.2.0"
+    "yargs": "^4.5.0"
   }
 }
