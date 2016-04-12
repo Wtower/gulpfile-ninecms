@@ -1,6 +1,6 @@
 {
   "name": "gulpfile-ninecms",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Front-end package management for NineCMS",
   "main": "index.js",
   "scripts": {
@@ -21,6 +21,7 @@
   "homepage": "https://github.com/Wtower/gulpfile-ninecms#readme",
   "dependencies": {
     "browserify": "^13.0.0",
+    "browserify-shim": "^3.8.12",
     "concurrent-transform": "^1.0.0",
     "del": "^2.2.0",
     "event-stream": "^3.3.2",

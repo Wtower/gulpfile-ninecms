@@ -6,6 +6,7 @@ Front-end package management for [NineCMS](https://github.com/Wtower/django-nine
 The gulpfile can be used for any web site including but not limited to sites built with NineCMS.
 
 [![npm](https://img.shields.io/npm/v/gulpfile-ninecms.svg?maxAge=2592000)](https://www.npmjs.com/package/gulpfile-ninecms)
+[![npm](https://img.shields.io/npm/dt/gulpfile-ninecms.svg?maxAge=2592000)](https://www.npmjs.com/package/gulpfile-ninecms)
 
 Contents
 --------
@@ -135,25 +136,68 @@ Browserify
 Quick reference to common packages:
 
 - [jQuery](http://rkulla.blogspot.gr/2014/04/using-browserify-with-jquery-backbonejs.html) 
-  npm: `jquery`, js: `$ = jQuery = require('jquery');`
+  
+  - npm: `jquery`
+  - js: `$ = jQuery = require('jquery');`
 
 - [jQuery plugins](http://blog.npmjs.org/post/112064849860/using-jquery-plugins-with-npm) (eg. scrollTo)
 
 - [Bootstrap](http://stackoverflow.com/questions/24827964/browserify-with-twitter-bootstrap)
-  npm: `bootstrap`, js: `require('bootstrap');`
+  
+  - npm package: `bootstrap`
+  - index.js: `require('bootstrap');`
+  - gulpfile assets path: `'node_modules/bootstrap/dist/*fonts/*'`
+  - gulpfile css path: `'node_modules/bootstrap/dist/css/bootstrap*(|-theme).css'`
 
 - html5shiv: either ignore or leave as is
-- [Angular](http://omarfouad.com/blog/2015/03/21/advanced-angularjs-structure-with-gulp-node-and-browserify/)
+
+- [Angular](http://omarfouad.com/blog/2015/03/21/advanced-angularjs-structure-with-gulp-node-and-browserify/) 
+  
+  - npm package: `angular`
+  - index.js: `require('angular');`
+
+- Angular plugins: `angular-sanitize` (as Angular)
 
 - Lightbox: `require('lightbox2');`
+
 - masonry.pkdg
+
 - video.js
+
 - waypoints
+
 - iosslider
+
+- animate.css
+
+  - npm package: `animate.css`
+  - gulpfile css path: `'node_modules/animate.css/animate.css'` 
+
 - wow
+
+  - dependencies: animate.css
+  - npm package: `wow.js`
+  - [browserify-shim](https://github.com/matthieua/WOW/issues/155#issuecomment-208875313)
+
 - owl
+
 - Font awesome npm: `font-awesome`
+
 - Normalize.css npm: `normalize.css`
+
+Browserify-shim
+---------------
+
+Packages that are not CommonJS compatible require a relative entry in `package.json`, as described above.
+The following entry is also required:
+
+      "browserify": {
+        "transform": [
+          "browserify-shim"
+        ]
+      },
+
+Browserify-shim is already included in gulpfile-ninecms dependencies.
 
 Useful links
 ------------
