@@ -26,6 +26,7 @@ var paths = {
     'node_modules/font-awesome/css/font-awesome.css',
     'node_modules/gulpfile-ninecms/style.css'
     //'static/myproject/extend.css'
+    //'static/build/builded_from_sass.css'
   ],
   js: [
       //'static/myproject/index.js'
@@ -311,9 +312,9 @@ gulp.task('mocha', tasks.mocha);
 // build task
 gulp.task('build', [
   'assets',
-  'css',
   'less',
   'sass',
+  'css',
   'browserify',
   'lintjs',
   'images',
@@ -326,10 +327,10 @@ gulp.task('build', [
 // --------------------------
 gulp.task('watch', ['build'], function() {
   gulp.watch(paths.css, ['css']);
-  gulp.watch(paths.less, ['less']);
-  gulp.watch(paths.sass, ['sass']);
+  gulp.watch(paths.less, ['less', 'css']);
+  gulp.watch(paths.sass, ['sass', 'css']);
   gulp.watch(paths.js.concat(['gulpfile.js']), ['lintjs', 'browserify']);
-  gulp.watch('./fonts.list', ['fonts']);
+  gulp.watch(['./fonts.list'], ['fonts']);
   //noinspection JSUnresolvedFunction
   gutil.log(gutil.colors.bgGreen('Watching for changes...'));
 });
