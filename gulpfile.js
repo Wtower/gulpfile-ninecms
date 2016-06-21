@@ -9,28 +9,23 @@
 var paths = {
   assets: [
     'node_modules/bootstrap/dist/*fonts/*',
-    'node_modules/font-awesome/*fonts/*',
-    'node_modules/puse-icons-feather/*fonts/*'
-    //'static/myproject/css/*fonts/*/*'
-    //'static/myproject/*images/*'
+    // 'static/css/*fonts/*/*'
+    // 'static/*images/*'
   ],
   sass: [
-    //'static/myproject/*.s?ss'
+    'static/sass/*.s?ss'
   ],
   less: [
-      //'static/myproject/*.less'
+      'static/less/*.less'
   ],
   css: [
-    'node_modules/normalize.css/normalize.css',
     'node_modules/bootstrap/dist/css/bootstrap*(|-theme).css',
-    'node_modules/font-awesome/css/font-awesome.css',
     'node_modules/gulpfile-ninecms/style.css'
-    //'static/myproject/extend.css'
+    //'static/css/extend.css'
     //'static/build/builded_from_sass.css'
   ],
-  js: [
-      //'static/myproject/index.js'
-  ],
+  js: 'static/js/index.js',
+  js_watch: ['static/js/*.js'],
   mocha: ['static/**/*test.js'],
   build: 'static/build/',
   images: 'media/ninecms'
@@ -107,6 +102,7 @@ var imageResize = require('gulp-image-resize');
 var es = require('event-stream');
 var rename = require('gulp-rename');
 var parallel  = require('concurrent-transform');
+//noinspection CodeAssistanceForCoreModules
 var os = require('os');
 var changed = require('gulp-changed');
 // google fonts
@@ -248,6 +244,7 @@ var tasks = {
     for (var i = 0; i < images.length; i++) {
       var img = images[i];
       img['imageMagick'] = true; // better quality
+      //noinspection JSUnresolvedFunction
       streams.push(gulp.src(img.src, {base: paths.images})
         .pipe(parallel(
           imageResize(img),
@@ -299,7 +296,7 @@ gulp.task('clean', tasks.clean);
 var req = build ? ['clean'] : [];
 // individual tasks
 gulp.task('assets', req, tasks.assets);
-gulp.task('css', req, tasks.css);
+gulp.task('css', req.concat(['less', 'sass']), tasks.css);
 gulp.task('less', req, tasks.less);
 gulp.task('sass', req, tasks.sass);
 gulp.task('browserify', req, tasks.browserify);
@@ -329,8 +326,9 @@ gulp.task('watch', ['build'], function() {
   gulp.watch(paths.css, ['css']);
   gulp.watch(paths.less, ['less', 'css']);
   gulp.watch(paths.sass, ['sass', 'css']);
-  gulp.watch(paths.js.concat(['gulpfile.js']), ['lintjs', 'browserify']);
+  gulp.watch(paths.js_watch, ['lintjs', 'browserify']);
   gulp.watch(['./fonts.list'], ['fonts']);
+  gulp.watch('gulpfile.js', ['build']);
   //noinspection JSUnresolvedFunction
   gutil.log(gutil.colors.bgGreen('Watching for changes...'));
 });
