@@ -16,7 +16,7 @@ var paths = {
     'static/sass/*.s?ss'
   ],
   less: [
-      'static/less/*.less'
+    'static/less/*.less'
   ],
   css: [
     'node_modules/bootstrap/dist/css/bootstrap*(|-theme).css',
@@ -25,7 +25,9 @@ var paths = {
     //'static/build/builded_from_sass.css'
   ],
   js: 'static/js/index.js',
-  js_watch: ['static/js/*.js'],
+  js_watch: [
+    'static/js/**/*.js'
+  ],
   mocha: ['static/**/*test.js'],
   build: 'static/build/',
   images: 'media/ninecms'
@@ -230,11 +232,23 @@ var tasks = {
   // linting
   // --------------------------
   lintjs: function() {
-    return gulp.src(paths.js/*.concat(['gulpfile.js'])*/)
+    return gulp.src(paths.js_watch)
       // gulpfile lint returns many false errors for `require()`
       .pipe(jshint())
       .pipe(jshint.reporter(stylish))
       .on('error', handleError('LINT'));
+  },
+  // --------------------------
+  // Concatenate js
+  // --------------------------
+  concatJs: function () {
+    return gulp.src(paths.js_watch)
+        .pipe(gulpif(!production, sourcemaps.init()))
+        .on('error', handleError('JS'))
+        .pipe(concat('index.min.js'))
+        .pipe(gulpif(production, uglify({ preserveComments: 'license' })))
+        .pipe(sourcemaps.write())
+        .pipe(gulp.dest(paths.build + 'js/'));
   },
   // --------------------------
   // Optimize asset images
@@ -301,6 +315,7 @@ gulp.task('less', req, tasks.less);
 gulp.task('sass', req, tasks.sass);
 gulp.task('browserify', req, tasks.browserify);
 gulp.task('lintjs', tasks.lintjs);
+gulp.task('concatJs', tasks.concatJs);
 gulp.task('images', tasks.images);
 gulp.task('clean_image_opts', tasks.clean_image_opts);
 gulp.task('fonts', tasks.fonts);
@@ -314,6 +329,7 @@ gulp.task('build', [
   'css',
   'browserify',
   'lintjs',
+  'concatJs',
   'images',
   'fonts',
   'mocha'
@@ -326,7 +342,7 @@ gulp.task('watch', ['build'], function() {
   gulp.watch(paths.css, ['css']);
   gulp.watch(paths.less, ['less', 'css']);
   gulp.watch(paths.sass, ['sass', 'css']);
-  gulp.watch(paths.js_watch, ['lintjs', 'browserify']);
+  gulp.watch(paths.js_watch, ['lintjs', 'browserify', 'concatJs']);
   gulp.watch(['./fonts.list'], ['fonts']);
   gulp.watch('gulpfile.js', ['build']);
   //noinspection JSUnresolvedFunction
