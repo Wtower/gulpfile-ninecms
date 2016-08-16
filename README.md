@@ -6,8 +6,11 @@ Front-end package management.
 The gulpfile can be used for any web site including but not limited to sites built with 
 [NineCMS](https://github.com/Wtower/django-ninecms).
 
-[![npm](https://img.shields.io/npm/v/gulpfile-ninecms.svg?maxAge=2592000)](https://www.npmjs.com/package/gulpfile-ninecms)
+[![NPM version][npm-image]][npm-url]
 [![npm](https://img.shields.io/npm/dt/gulpfile-ninecms.svg?maxAge=2592000)](https://www.npmjs.com/package/gulpfile-ninecms)
+
+[npm-image]: https://badge.fury.io/js/gulpfile-ninecms.svg
+[npm-url]: https://npmjs.org/package/gulpfile-ninecms
 
 Contents
 --------

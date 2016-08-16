@@ -1,23 +1,24 @@
 /**
  * gulpfile-ninecms
+ *
+ * gulp (watch) : for development and livereload
+ * gulp build : for a one off development build
+ * gulp build --production : for a minified production build
  */
 
-// -------------
-// Configuration
-// -------------
-// Specify paths
+/*
+ * Configuration
+ */
 var paths = {
   assets: [
-    'node_modules/bootstrap/dist/*fonts/*',
+    'node_modules/bootstrap/dist/*fonts/*'
     // 'static/css/*fonts/*/*'
     // 'static/*images/*'
   ],
   sass: [
     'static/sass/*.s?ss'
   ],
-  less: [
-    'static/less/*.less'
-  ],
+  less: [],
   css: [
     'node_modules/bootstrap/dist/css/bootstrap*(|-theme).css',
     'node_modules/gulpfile-ninecms/style.css'
@@ -28,7 +29,11 @@ var paths = {
   js_watch: [
     'static/js/**/*.js'
   ],
-  mocha: ['static/**/*test.js'],
+  js_lint: [
+    'static/js/**/*.js'
+  ],
+  js_cover: [],
+  mocha: [],
   build: 'static/build/',
   images: 'media/ninecms'
 };
@@ -71,16 +76,15 @@ var images = [
   }
 ];
 
-// ---------------
-// Include section
-//----------------
+/*
+ * Include section
+ */
 'use strict';
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var del = require('del');
 var gulpif = require('gulp-if');
 var notify = require('gulp-notify');
-//noinspection JSUnresolvedVariable
 var argv = require('yargs').argv;
 // css
 var concat = require('gulp-concat');
@@ -97,68 +101,71 @@ var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var uglify = require('gulp-uglify');
 // linting
-var jshint = require('gulp-jshint');
-var stylish = require('jshint-stylish');
+var eslint = require('gulp-eslint');
+var excludeGitignore = require('gulp-exclude-gitignore');
 // image optimization
 var imageResize = require('gulp-image-resize');
 var es = require('event-stream');
 var rename = require('gulp-rename');
-var parallel  = require('concurrent-transform');
-//noinspection CodeAssistanceForCoreModules
+var parallel = require('concurrent-transform');
 var os = require('os');
 var changed = require('gulp-changed');
 // google fonts
 var googleWebFonts = require('gulp-google-webfonts');
 // testing/mocha
 var mocha = require('gulp-mocha');
+var plumber = require('gulp-plumber');
+var karmaServer = require('karma').Server;
+var path = require('path');
+var fs = require('fs');
 
-// -------
-// Prepare
-// -------
+/*
+ * Prepare
+ */
 // gulp build --production
-//noinspection JSUnresolvedVariable
 var production = !!argv.production;
 // determine if we're doing a build
 // and if so, bypass the livereload
 var build = argv._.length ? argv._[0] === 'build' : false;
 var watch = argv._.length ? argv._[0] === 'watch' : true;
 
-// ----------------------------
-// Error notification methods
-// ----------------------------
-var handleError = function(task) {
-  return function(err) {
-      notify.onError({
-        message: task + ' failed, check the logs',
-        sound: false
-      })(err);
-    //noinspection JSUnresolvedFunction
+/*
+ * Error notification methods
+ */
+var handleError = function (task) {
+  return function (err) {
+    notify.onError({
+      message: task + ' failed, check the logs',
+      sound: false
+    })(err);
     gutil.log(gutil.colors.bgRed(task + ' error:'), gutil.colors.red(err));
   };
 };
 
-// --------------------------
-// CUSTOM TASK METHODS
-// --------------------------
+/**
+ * CUSTOM TASK METHODS
+ */
 var tasks = {
-  // --------------------------
-  // Delete build folder
-  // --------------------------
-  clean: function() {
+  /*
+   * Delete build folder
+   */
+  clean: function () {
     return del([paths.build]);
   },
-  // --------------------------
-  // Copy static assets
-  // --------------------------
-  assets: function() {
+
+  /*
+   * Copy static assets
+   */
+  assets: function () {
     return gulp.src(paths.assets)
         .on('error', handleError('Assets'))
         .pipe(gulp.dest(paths.build));
   },
-  // --------------------------
-  // CSS
-  // --------------------------
-  css: function() {
+
+  /*
+   * CSS
+   */
+  css: function () {
     return gulp.src(paths.css)
         .pipe(gulpif(!production, sourcemaps.init()))
         .on('error', handleError('CSS'))
@@ -168,10 +175,11 @@ var tasks = {
         .pipe(sourcemaps.write())
         .pipe(gulp.dest(paths.build + 'css/'));
   },
-  // --------------------------
-  // LESS
-  // --------------------------
-  less: function() {
+
+  /*
+   * LESS
+   */
+  less: function () {
     return gulp.src(paths.less)
         .pipe(gulpif(!production, sourcemaps.init()))
         .on('error', handleError('LESS'))
@@ -181,10 +189,11 @@ var tasks = {
         .pipe(sourcemaps.write())
         .pipe(gulp.dest(paths.build + 'css/'));
   },
-  // --------------------------
-  // SASS (libsass)
-  // --------------------------
-  sass: function() {
+
+  /*
+   * SASS
+   */
+  sass: function () {
     return gulp.src(paths.sass)
       // sourcemaps + sass + error handling
       .pipe(gulpif(!production, sourcemaps.init()))
@@ -204,10 +213,11 @@ var tasks = {
       .pipe(sourcemaps.write({'includeContent': true}))
       .pipe(gulp.dest(paths.build + 'css/'));
   },
-  // --------------------------
-  // Browserify
-  // --------------------------
-  browserify: function() {
+
+  /*
+   * Browserify
+   */
+  browserify: function () {
     var bundler = browserify(paths.js, {
       debug: !production,
       cache: {}
@@ -215,8 +225,7 @@ var tasks = {
     if (watch) {
       bundler = watchify(bundler);
     }
-    var rebundle = function() {
-      //noinspection JSUnresolvedFunction
+    var rebundle = function () {
       return bundler.bundle()
         .on('error', handleError('Browserify'))
         .pipe(source('build.js'))
@@ -224,41 +233,52 @@ var tasks = {
         .pipe(gulpif(production, uglify()))
         .pipe(gulp.dest(paths.build + 'js/'));
     };
-    //noinspection JSUnresolvedFunction
     bundler.on('update', rebundle);
     return rebundle();
   },
-  // --------------------------
-  // linting
-  // --------------------------
-  lintjs: function() {
-    return gulp.src(paths.js_watch)
-      // gulpfile lint returns many false errors for `require()`
-      .pipe(jshint())
-      .pipe(jshint.reporter(stylish))
+
+  /*
+   * linting
+   */
+  lintjs: function () {
+    return gulp.src(paths.js_lint)
+      .pipe(excludeGitignore())
+      .pipe(eslint({
+        rules: {
+          // control characters eg `\n` are required for file appends
+          'no-control-regex': 'off',
+          // allow double quotes to avoid escaping single
+          'quotes': ['error', 'single', {avoidEscape: true}],
+          // relax curly
+          'curly': ['error', 'multi-line']
+        }
+      }))
+      .pipe(eslint.format())
+      .pipe(eslint.failAfterError())
       .on('error', handleError('LINT'));
   },
-  // --------------------------
-  // Concatenate js
-  // --------------------------
+
+  /*
+   * Concatenate js
+   */
   concatJs: function () {
     return gulp.src(paths.js_watch)
-        .pipe(gulpif(!production, sourcemaps.init()))
-        .on('error', handleError('JS'))
-        .pipe(concat('index.min.js'))
-        .pipe(gulpif(production, uglify({ preserveComments: 'license' })))
-        .pipe(sourcemaps.write())
-        .pipe(gulp.dest(paths.build + 'js/'));
+      .pipe(gulpif(!production, sourcemaps.init()))
+      .on('error', handleError('JS'))
+      .pipe(concat('index.min.js'))
+      .pipe(gulpif(production, uglify({preserveComments: 'license', mangle: false})))
+      .pipe(sourcemaps.write())
+      .pipe(gulp.dest(paths.build + 'js/'));
   },
-  // --------------------------
-  // Optimize asset images
-  // --------------------------
-  images: function() {
+
+  /*
+   * Optimize asset images
+   */
+  images: function () {
     var streams = [];
     for (var i = 0; i < images.length; i++) {
       var img = images[i];
       img['imageMagick'] = true; // better quality
-      //noinspection JSUnresolvedFunction
       streams.push(gulp.src(img.src, {base: paths.images})
         .pipe(parallel(
           imageResize(img),
@@ -274,37 +294,51 @@ var tasks = {
     return es.merge(streams)
       .pipe(gulp.dest(paths.images));
   },
-  // -----------------------------
-  // Delete optimized image styles
-  // -----------------------------
-  clean_image_opts: function() {
-    // ATTENTION: make sure the path form pagetype/field/style/img is used
+
+  /*
+   * Delete optimized image styles
+   * ATTENTION: make sure the path form pagetype/field/style/img is used
+   */
+  clean_image_opts: function () {
     return del([paths.images + '/*/image/*/*']);
   },
-  // ----------------
-  // Google web fonts
-  // ----------------
-  fonts: function() {
+
+  /*
+   * Google web fonts
+   */
+  fonts: function () {
     return gulp.src('./fonts.list')
       .pipe(googleWebFonts())
       .pipe(gulp.dest(paths.build + 'fonts/'));
   },
-  // --------------------------
-  // Testing with mocha
-  // --------------------------
-  mocha: function() {
-    return gulp.src(paths.mocha, {read: false})
-      .pipe(mocha({
-        'ui': 'bdd',
-        'reporter': 'spec'
-      })
-    );
+
+  /*
+   * Testing with mocha
+   * https://github.com/sindresorhus/gulp-mocha/issues/54
+   */
+  mocha: function () {
+    return gulp.src(paths.mocha)
+      .pipe(plumber())
+      .pipe(mocha({reporter: 'spec', colors: true}))
+      .on('error', handleError('Mocha'));
+  },
+
+  /*
+   * Testing with karma
+   */
+  karma: function (done) {
+    new karmaServer({
+      configFile: path.join(__dirname, '/karma.conf.js'),
+      singleRun: true
+    }, function () {
+      done();
+    }).start();
   }
 };
 
-// --------------------------
-// CUSTOMS TASKS
-// --------------------------
+/*
+ * CUSTOMS TASKS
+ */
 gulp.task('clean', tasks.clean);
 // for production we require the clean method on every individual task
 var req = build ? ['clean'] : [];
@@ -320,6 +354,7 @@ gulp.task('images', req, tasks.images);
 gulp.task('clean_image_opts', req, tasks.clean_image_opts);
 gulp.task('fonts', req, tasks.fonts);
 gulp.task('mocha', tasks.mocha);
+gulp.task('karma', tasks.karma);
 
 // build task
 gulp.task('build', [
@@ -328,29 +363,28 @@ gulp.task('build', [
   'sass',
   'css',
   'browserify',
-  'lintjs',
   'concatJs',
   'images',
-  'fonts',
-  'mocha'
+  'fonts'
 ]);
 
-// --------------------------
-// DEV/WATCH TASK
-// --------------------------
-gulp.task('watch', ['build'], function() {
+// test task
+gulp.task('test', [
+  'lintjs',
+  'mocha',
+  'karma'
+]);
+
+/*
+ * DEV/WATCH TASK
+ */
+gulp.task('watch', ['build'], function () {
   gulp.watch(paths.css, ['css']);
   gulp.watch(paths.less, ['less', 'css']);
   gulp.watch(paths.sass, ['sass', 'css']);
-  gulp.watch(paths.js_watch, ['lintjs', 'browserify', 'concatJs']);
+  gulp.watch(paths.js_watch, ['browserify', 'concatJs']);
   gulp.watch(['./fonts.list'], ['fonts']);
-  gulp.watch('gulpfile.js', ['build']);
-  //noinspection JSUnresolvedFunction
   gutil.log(gutil.colors.bgGreen('Watching for changes...'));
 });
 
 gulp.task('default', ['watch']);
-
-// gulp (watch) : for development and livereload
-// gulp build : for a one off development build
-// gulp build --production : for a minified production build
