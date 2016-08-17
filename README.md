@@ -10,7 +10,7 @@ The gulpfile can be used for any web site including but not limited to sites bui
 [![Dependency Status][daviddm-image]][daviddm-url] 
 [![npm](https://img.shields.io/npm/dt/gulpfile-ninecms.svg?maxAge=2592000)](https://www.npmjs.com/package/gulpfile-ninecms)
 
-[daviddm-image]: https://david-dm.org/Wtower/gulpfile-ninecms?theme=shields.io
+[daviddm-image]: https://david-dm.org/Wtower/gulpfile-ninecms.svg?theme=shields.io
 [daviddm-url]: https://david-dm.org/Wtower/gulpfile-ninecms
 [npm-image]: https://badge.fury.io/js/gulpfile-ninecms.svg
 [npm-url]: https://npmjs.org/package/gulpfile-ninecms
