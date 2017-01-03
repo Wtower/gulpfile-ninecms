@@ -22,7 +22,7 @@ in any project regardless of the tech stack.
 
 It also offers a default ``gulpfile.js`` and related dependencies in the ``package.json``.
 
-[1] https://github.com/gulpjs/gulp
+[1]: https://github.com/gulpjs/gulp
 
 Documentation
 -------------
