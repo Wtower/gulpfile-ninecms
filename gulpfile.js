@@ -12,25 +12,25 @@
 var paths = {
   assets: [
     'node_modules/bootstrap/dist/*fonts/*'
-    // 'static/css/*fonts/*/*'
-    // 'static/*images/*'
+    // 'private/css/*fonts/*/*'
+    // 'private/*images/*'
   ],
   sass: [
-    'static/sass/*.s?ss'
+    'private/sass/*.s?ss'
   ],
   less: [],
   css: [
     'node_modules/bootstrap/dist/css/bootstrap*(|-theme).css',
     'node_modules/gulpfile-ninecms/style.css'
-    //'static/css/extend.css'
-    //'static/build/builded_from_sass.css'
+    //'private/css/extend.css'
+    //'private/build/builded_from_sass.css'
   ],
-  js: 'static/js/index.js',
+  js: 'private/js/index.js',
   js_watch: [
-    'static/js/**/*.js'
+    'private/js/**/*.js'
   ],
   js_lint: [
-    'static/js/**/*.js'
+    'private/js/**/*.js'
   ],
   partials: [
     'private/*javascripts/contest/**/*.html'
@@ -179,6 +179,7 @@ var tasks = {
   clean_image_opts: function () { return taskMethods.clean_image_opts() },
   fonts: function () { return taskMethods.fonts(paths); },
   nsp: function () { return taskMethods.nsp(); },
+  karma: function () { return taskMethods.karma(); },
 
   adminAssets: function () { return taskMethods.assets(paths.admin); },
   adminCss: function () { return taskMethods.css(paths.admin); },

@@ -38,6 +38,9 @@ var changed = require('gulp-changed');
 // google fonts
 var googleWebFonts = require('gulp-google-webfonts');
 // testing
+var mocha = require('gulp-mocha');
+var istanbul = require('gulp-istanbul');
+var plumber = require('gulp-plumber');
 var nsp = require('gulp-nsp');
 var karmaServer = require('karma').Server;
 var path = require('path');
@@ -218,7 +221,7 @@ var taskMethods = {
    * Delete optimized image styles
    * ATTENTION: make sure the path form pagetype/field/style/img is used
    */
-  clean_image_opts: function () {
+  clean_image_opts: function (paths) {
     return del([paths.images + '/*/image/*/*']);
   },
 
@@ -236,6 +239,33 @@ var taskMethods = {
    */
   nsp: function (cb) {
     nsp({package: path.resolve('package.json')}, cb);
+  },
+
+  /*
+   * Pre-Testing
+   */
+  preTest: function (paths) {
+    return gulp.src(paths.js_cover)
+      .pipe(excludeGitignore())
+      .pipe(istanbul({
+        includeUntested: true
+      }))
+      .pipe(istanbul.hookRequire());
+  },
+
+  /*
+   * Testing with mocha
+   * https://github.com/sindresorhus/gulp-mocha/issues/54#issuecomment-240666300
+   */
+  mocha: function (paths) {
+    gulp.doneCallback = function (err) {
+      process.exit(err ? 1 : 0);
+    };
+    return gulp.src(paths.mocha)
+      .pipe(plumber())
+      .pipe(mocha({reporter: 'spec', colors: true}))
+      .on('error', handleError('Mocha'))
+      .pipe(istanbul.writeReports());
   },
 
   /*
