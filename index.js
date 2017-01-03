@@ -1,78 +1,307 @@
 /**
- * gulpfile-ninecms main js
- * Created by gkarak on 4/3/2016.
+ * TASK METHODS
  */
-module.exports = (function($) {
+'use strict';
+var gulp = require('gulp');
+var gutil = require('gulp-util');
+var del = require('del');
+var notify = require('gulp-notify');
+var gulpif = require('gulp-if');
+var argv = require('yargs').argv;
+// css
+var concat = require('gulp-concat');
+var minifyCSS = require('gulp-minify-css');
+var autoprefixer = require('gulp-autoprefixer');
+var sourcemaps = require('gulp-sourcemaps');
+// sass/less
+var less = require('gulp-less');
+var sass = require('gulp-sass');
+// js
+var watchify = require('watchify');
+var browserify = require('browserify');
+var source = require('vinyl-source-stream');
+var buffer = require('vinyl-buffer');
+var uglify = require('gulp-uglify');
+// partials
+var minifyHtml = require('gulp-minify-html');
+var ngHtml2Js = require('gulp-ng-html2js');
+// linting
+var eslint = require('gulp-eslint');
+var excludeGitignore = require('gulp-exclude-gitignore');
+// image optimization
+var imageResize = require('gulp-image-resize');
+var es = require('event-stream');
+var rename = require('gulp-rename');
+var parallel = require('concurrent-transform');
+var os = require('os');
+var changed = require('gulp-changed');
+// google fonts
+var googleWebFonts = require('gulp-google-webfonts');
+// testing
+var mocha = require('gulp-mocha');
+var istanbul = require('gulp-istanbul');
+var plumber = require('gulp-plumber');
+var nsp = require('gulp-nsp');
+var karmaServer = require('karma').Server;
+var path = require('path');
+var fs = require('fs');
 
-    jQuery.fn.topLink = function(settings) {
-      settings = jQuery.extend({
-        min: 1,
-        fadeSpeed: 200
-      }, settings);
-      return this.each(function() {
-        //listen for scroll
-        var el = jQuery(this);
-        el.hide(); //in case the user forgot
-        jQuery(window).scroll(function() {
-          if(jQuery(window).scrollTop() >= settings.min) {
-            el.fadeIn(settings.fadeSpeed);
-          }
-          else {
-            el.fadeOut(settings.fadeSpeed);
-          }
-        });
-      });
+// gulp build --production
+var production = !!argv.production;
+// determine if we're doing a build
+// and if so, bypass the livereload
+var build = argv._.length ? argv._[0] === 'build' : false;
+var watch = argv._.length ? argv._[0] === 'watch' : true;
+
+var config = {
+  autoprefixer_versions: ['last 2 version', 'safari 5', 'ie 8', 'ie 9']
+};
+
+var handleError = function (task) {
+  return function (err) {
+    notify.onError({
+      message: task + ' failed, check the logs',
+      sound: false
+    })(err);
+    gutil.log(gutil.colors.bgRed(task + ' error:'), gutil.colors.red(err));
+  };
+};
+
+var taskMethods = {
+  /*
+   * Delete build folder
+   */
+  clean: function (paths) {
+    return del([paths.build]);
+  },
+
+  /*
+   * Copy static assets
+   */
+  assets: function (paths) {
+    return gulp.src(paths.assets)
+      .on('error', handleError('Assets'))
+      .pipe(gulp.dest(paths.build));
+  },
+
+  /*
+   * CSS
+   */
+  css: function (paths) {
+    return gulp.src(paths.css)
+      .pipe(gulpif(!production, sourcemaps.init()))
+      .on('error', handleError('CSS'))
+      .pipe(concat('style.min.css'))
+      .pipe(gulpif(production, autoprefixer(config.autoprefixer_versions)))
+      .pipe(gulpif(production, minifyCSS()))
+      .pipe(sourcemaps.write())
+      .pipe(gulp.dest(paths.build + 'css/'));
+  },
+
+  /*
+   * LESS
+   */
+  less: function (paths) {
+    return gulp.src(paths.less)
+      .pipe(gulpif(!production, sourcemaps.init()))
+      .on('error', handleError('LESS'))
+      .pipe(less())
+      .pipe(gulpif(production, autoprefixer(config.autoprefixer_versions)))
+      .pipe(gulpif(production, minifyCSS()))
+      .pipe(sourcemaps.write())
+      .pipe(gulp.dest(paths.build + 'css/'));
+  },
+
+  /*
+   * SASS
+   */
+  sass: function (paths) {
+    return gulp.src(paths.sass)
+    // sourcemaps + sass + error handling
+      .pipe(gulpif(!production, sourcemaps.init()))
+      .pipe(sass({
+        sourceComments: !production,
+        outputStyle: production ? 'compressed' : 'nested'
+      }))
+      .on('error', handleError('SASS'))
+      // generate .maps
+      .pipe(gulpif(!production, sourcemaps.write({
+        'includeContent': false,
+        'sourceRoot': '.'
+      })))
+      .pipe(gulpif(!production, sourcemaps.init({'loadMaps': true})))
+      .pipe(gulpif(production, autoprefixer(config.autoprefixer_versions)))
+      // we don't serve the source files so include scss content inside the sourcemaps
+      .pipe(sourcemaps.write({'includeContent': true}))
+      .pipe(gulp.dest(paths.build + 'css/'));
+  },
+
+  /*
+   * Browserify
+   */
+  browserify: function (paths) {
+    var bundler = browserify(paths.js, {
+      debug: !production,
+      cache: {}
+    });
+    if (watch) {
+      bundler = watchify(bundler);
+    }
+    var rebundle = function () {
+      return bundler.bundle()
+        .on('error', handleError('Browserify'))
+        .pipe(source('build.js'))
+        .pipe(gulpif(production, buffer()))
+        .pipe(gulpif(production, uglify()))
+        .pipe(gulp.dest(paths.build + 'js/'));
     };
+    bundler.on('update', rebundle);
+    return rebundle();
+  },
 
-    $(document).ready(function () {
-        // Loader
-        // hide scroll and show on window.load
-        var loader = $('#loader');
-        if (loader.length && loader.css('display') != 'none') $('body').css({overflow: 'hidden'});
-
-        // Page top
-        $('#top-link')
-            // set the link
-            .topLink({
-                min: 400,
-                fadeSpeed: 500
-            })
-            // smooth scroll
-            .click(function (e) {
-                e.preventDefault();
-                $.scrollTo(0, 300);
-            });
-
-        // Shrink
-        if ($('.shrinkable').length) {
-            $(window).scroll(function () {
-                if ($(this).scrollTop() > 50)
-                    $('.shrinkable').addClass('shrink');
-                else $('.shrinkable').removeClass('shrink');
-            });
+  /*
+   * linting
+   */
+  lintJs: function (paths) {
+    return gulp.src(paths.js_lint)
+      .pipe(excludeGitignore())
+      .pipe(eslint({
+        rules: {
+          // control characters eg `\n` are required for file appends
+          'no-control-regex': 'off',
+          // allow double quotes to avoid escaping single
+          'quotes': ['error', 'single', {avoidEscape: true}],
+          // relax curly
+          'curly': ['error', 'multi-line']
         }
+      }))
+      .pipe(eslint.format())
+      .pipe(eslint.failAfterError())
+      .on('error', handleError('LINT'));
+  },
 
-        // Bookmark smooth scroll
-        $('.nav a[href*="#"]').each(function () {
-            var bookmark = $(this).attr('href').match(/(#.*)$/g)[0];
-            if (bookmark == '#') return;
-            if (!$(bookmark).length) return;
-            $(this).on('click', function () {
-                $.scrollTo(bookmark, 300, {offset: {top: -50, left: 0}});
-            });
-        });
+  /*
+   * Concatenate js
+   */
+  concatJs: function (paths) {
+    return gulp.src(paths.js_watch)
+      .pipe(gulpif(!production, sourcemaps.init()))
+      .on('error', handleError('JS'))
+      .pipe(concat('index.min.js'))
+      .pipe(gulpif(production, uglify({preserveComments: 'license', mangle: false})))
+      .pipe(sourcemaps.write())
+      .pipe(gulp.dest(paths.build + 'js/'));
+  },
 
-        // bootstrap
-        $('input[type="text"], input[type="number"], input[type="email"], input[type="url"], select')
-            .addClass('form-control');
+  /*
+   * Optimize asset images
+   */
+  images: function (paths, images) {
+    var streams = [];
+    for (var i = 0; i < images.length; i++) {
+      var img = images[i];
+      img['imageMagick'] = true; // better quality
+      streams.push(gulp.src(img.src, {base: paths.images})
+        .pipe(parallel(
+          imageResize(img),
+          os.cpus().length
+        ))
+        // http://stackoverflow.com/questions/16724620/mutable-variable-is-accessible-from-closure-how-can-i-fix-this
+        .pipe(rename((function (img_path) {
+          return function (path) {
+            path.dirname += img_path;
+          }
+        })(img.build))));
+    }
+    return es.merge(streams)
+      .pipe(gulp.dest(paths.images));
+  },
 
-    });
+  /*
+   * Delete optimized image styles
+   * ATTENTION: make sure the path form pagetype/field/style/img is used
+   */
+  clean_image_opts: function (paths) {
+    return del([paths.images + '/*/image/*/*']);
+  },
 
-    $(window).load(function () {
-        // Loader
-        // hide loader and show scrollbars (hidden in document.ready)
-        $('#loader, #loader-container').fadeOut('slow');
-        $('body').css({'overflow': 'visible'});
-    });
+  /*
+   * Google web fonts
+   */
+  fonts: function (paths) {
+    return gulp.src('./fonts.list')
+      .pipe(googleWebFonts())
+      .pipe(gulp.dest(paths.build + 'fonts/'));
+  },
 
-})(jQuery);
+  /*
+   * Testing security exploits with NSP
+   */
+  nsp: function (cb) {
+    nsp({package: path.resolve('package.json')}, cb);
+  },
+
+  /*
+   * Pre-Testing
+   */
+  preTest: function (paths) {
+    return gulp.src(paths.js_cover)
+      .pipe(excludeGitignore())
+      .pipe(istanbul({
+        includeUntested: true
+      }))
+      .pipe(istanbul.hookRequire());
+  },
+
+  /*
+   * Testing with mocha
+   * https://github.com/sindresorhus/gulp-mocha/issues/54#issuecomment-240666300
+   */
+  mocha: function (paths) {
+    gulp.doneCallback = function (err) {
+      process.exit(err ? 1 : 0);
+    };
+    return gulp.src(paths.mocha)
+      .pipe(plumber())
+      .pipe(mocha({reporter: 'spec', colors: true}))
+      .on('error', handleError('Mocha'))
+      .pipe(istanbul.writeReports());
+  },
+
+  /*
+   * Testing with karma
+   */
+  karma: function (done) {
+    new karmaServer({
+      configFile: path.join(__dirname, '/karma.conf.js'),
+      singleRun: true
+    }, function () {
+      done();
+    }).start();
+  },
+
+  /*
+   * Pre-load angular templates
+   */
+  preloadNgHtml: function (paths) {
+    return gulp.src(paths.partials)
+      .pipe(minifyHtml({
+        empty: true,
+        spare: true,
+        quotes: true
+      }))
+      .pipe(ngHtml2Js({
+        moduleName: function (file) {
+          var pathParts = file.path.split('/');
+          var folder = pathParts[pathParts.length - 2];
+          return folder.replace(/-[a-z]/g, function (match) {
+            return match.substr(1).toUpperCase();
+          });
+        }
+      }))
+      .pipe(concat('partials.js'))
+      .pipe(gulp.dest(paths.build));
+  }
+};
+
+module.exports = taskMethods;
