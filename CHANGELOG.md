@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+v0.3.0
+------
+
+Date: Tue 3 Jan, 2017
+
+- Moved task methods into index.js
+- Added mocha tests
+- Added documentation
+- Updated dependencies
+
 v0.2.0
 ------
 
