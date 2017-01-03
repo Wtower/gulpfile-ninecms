@@ -24,7 +24,6 @@ It also offers a default ``gulpfile.js`` and related dependencies in the ``packa
 
    installation
    howto
-   tasks
    tasks/clean
    tasks/assets
    tasks/less
