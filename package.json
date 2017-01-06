@@ -1,6 +1,6 @@
 {
   "name": "gulpfile-ninecms",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Front-end package management",
   "main": "index.js",
   "scripts": {

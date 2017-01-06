@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+v0.3.2
+------
+
+Date: upcoming
+
+- Fix #6: gulp-nsp error
+
 v0.3.1
 ------
 

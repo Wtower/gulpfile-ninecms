@@ -238,6 +238,7 @@ var taskMethods = {
    * Testing security exploits with NSP
    */
   nsp: function (cb) {
+    if (!cb) cb = function() {};
     nsp({package: path.resolve('package.json')}, cb);
   },
 
