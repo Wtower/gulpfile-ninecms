@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+v0.3.1
+------
+
+Date: Fri 6 Jan, 2017
+
+- Replaced deprecated gulp-minify-css #5
+
 v0.3.0
 ------
 

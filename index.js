@@ -10,7 +10,7 @@ var gulpif = require('gulp-if');
 var argv = require('yargs').argv;
 // css
 var concat = require('gulp-concat');
-var minifyCSS = require('gulp-minify-css');
+var minifyCSS = require('gulp-clean-css');
 var autoprefixer = require('gulp-autoprefixer');
 var sourcemaps = require('gulp-sourcemaps');
 // sass/less
