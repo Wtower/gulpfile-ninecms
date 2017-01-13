@@ -1,12 +1,15 @@
 CHANGELOG
 =========
 
-v0.3.2
+v0.4.0
 ------
 
-Date: upcoming
+Date: Fri 13 Jan, 2017
 
 - Fix #6: gulp-nsp error
+- Added `paths.fonts` in font task
+
+:warning: requires to add `paths.fonts` in existing gulpfiles if using the fonts task.
 
 v0.3.1
 ------

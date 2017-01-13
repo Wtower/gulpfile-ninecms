@@ -10,11 +10,14 @@ Syntax
 Description
 -----------
 
-Download Google fonts specified in ``/fonts.list`` to ``paths.build`` ``/fonts`` and generate a stylesheet for them.
+Download Google fonts specified in ``paths.fonts`` ``/fonts.list`` to ``paths.build`` ``/fonts`` and generate a
+stylesheet for them.
 
 Uses `gulp-google-webfonts`_.
 
 .. _gulp-google-webfonts: https://www.npmjs.com/package/gulp-google-webfonts
+
+**New in v0.4.0**: Now the ``fonts.list`` location needs to be specified in ``paths.fonts``.
 
 Example
 -------

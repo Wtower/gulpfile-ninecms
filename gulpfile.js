@@ -35,6 +35,7 @@ var paths = {
   partials: [
     'private/*javascripts/contest/**/*.html'
   ],
+  fonts: 'private/',
   build: 'static/',
   images: '',
 

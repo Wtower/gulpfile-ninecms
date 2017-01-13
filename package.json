@@ -1,6 +1,6 @@
 {
   "name": "gulpfile-ninecms",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "Front-end package management",
   "main": "index.js",
   "scripts": {
@@ -45,7 +45,7 @@
     "gulp-plumber": "^1.1.0",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^3.0.0",
-    "gulp-sourcemaps": "^1.6.0",
+    "gulp-sourcemaps": "^2.4.0",
     "gulp-uglify": "^2.0.0",
     "gulp-util": "^3.0.7",
     "jasmine-core": "^2.5.2",

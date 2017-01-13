@@ -229,7 +229,7 @@ var taskMethods = {
    * Google web fonts
    */
   fonts: function (paths) {
-    return gulp.src('./fonts.list')
+    return gulp.src(paths.fonts + './fonts.list')
       .pipe(googleWebFonts())
       .pipe(gulp.dest(paths.build + 'fonts/'));
   },
