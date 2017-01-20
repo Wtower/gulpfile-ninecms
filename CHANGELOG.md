@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+v0.4.1
+------
+
+Date: Fri 20 Jan, 2017
+
+- Added inline css task
+- Added base64 task
+
 v0.4.0
 ------
 

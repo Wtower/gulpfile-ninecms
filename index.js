@@ -8,6 +8,8 @@ var del = require('del');
 var notify = require('gulp-notify');
 var gulpif = require('gulp-if');
 var argv = require('yargs').argv;
+var path = require('path');
+var fs = require('fs');
 // css
 var concat = require('gulp-concat');
 var minifyCSS = require('gulp-clean-css');
@@ -43,8 +45,9 @@ var istanbul = require('gulp-istanbul');
 var plumber = require('gulp-plumber');
 var nsp = require('gulp-nsp');
 var karmaServer = require('karma').Server;
-var path = require('path');
-var fs = require('fs');
+// inline css & base64
+var base64 = require('gulp-base64');
+var inlineCss = require('gulp-inline-css');
 
 // gulp build --production
 var production = !!argv.production;
@@ -286,6 +289,7 @@ var taskMethods = {
    */
   preloadNgHtml: function (paths) {
     return gulp.src(paths.partials)
+      .on('error', handleError('preloadNgHtml'))
       .pipe(minifyHtml({
         empty: true,
         spare: true,
@@ -302,6 +306,31 @@ var taskMethods = {
       }))
       .pipe(concat('partials.js'))
       .pipe(gulp.dest(paths.build));
+  },
+
+  /*
+   * base64 images into css
+   */
+  base64: function (paths) {
+    return gulp.src(paths.base64)
+      .on('error', handleError('base64'))
+      .pipe(base64({
+        extensions: ['svg', 'png', 'jpg'],
+        maxImageSize: 14*1024, // bytes
+        debug: !production
+      }))
+      .pipe(concat('base64.css'))
+      .pipe(gulp.dest(paths.build + 'css/'));
+  },
+
+  /*
+   * inline css into html, suitable for emails
+   */
+  inlineCss: function (paths) {
+    return gulp.src(paths.inlineCss.html)
+      .on('error', handleError('inlineCss'))
+      .pipe(inlineCss())
+      .pipe(gulp.dest(paths.inlineCss.build))
   }
 };
 

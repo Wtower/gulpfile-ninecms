@@ -37,5 +37,7 @@ It also offers a default ``gulpfile.js`` and related dependencies in the ``packa
    tasks/mocha
    tasks/karma
    tasks/fonts
+   tasks/base64
+   tasks/inline_css
    tasks/image
    other
