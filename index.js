@@ -329,7 +329,10 @@ var taskMethods = {
   inlineCss: function (paths) {
     return gulp.src(paths.inlineCss.html)
       .on('error', handleError('inlineCss'))
-      .pipe(inlineCss())
+      .pipe(inlineCss({
+        preserveMediaQueries: true,
+        applyTableAttributes: true
+      }))
       .pipe(gulp.dest(paths.inlineCss.build))
   }
 };

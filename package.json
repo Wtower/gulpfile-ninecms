@@ -1,6 +1,6 @@
 {
   "name": "gulpfile-ninecms",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Front-end package management",
   "main": "index.js",
   "scripts": {
@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/Wtower/gulpfile-ninecms#readme",
   "dependencies": {
-    "browserify": "^13.0.0",
+    "browserify": "^14.0.0",
     "browserify-shim": "^3.8.12",
     "concurrent-transform": "^1.0.0",
     "del": "^2.2.0",
@@ -35,14 +35,14 @@
     "gulp-exclude-gitignore": "^1.0.0",
     "gulp-google-webfonts": "^0.0.14",
     "gulp-if": "^2.0.0",
-    "gulp-image-resize": "^0.11.0",
+    "gulp-image-resize": "^0.12.0",
     "gulp-inline-css": "^3.1.0",
     "gulp-istanbul": "^1.0.0",
     "gulp-less": "^3.0.5",
     "gulp-minify-html": "^1.0.6",
     "gulp-mocha": "^3.0.1",
     "gulp-ng-html2js": "^0.2.2",
-    "gulp-notify": "^2.2.0",
+    "gulp-notify": "^3.0.0",
     "gulp-nsp": "^2.4.2",
     "gulp-plumber": "^1.1.0",
     "gulp-rename": "^1.2.2",

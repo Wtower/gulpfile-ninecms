@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+v0.4.2
+------
+
+Date: Mon 30 Jan 2017
+
+- Added proper options in inline css task
+- Updated dependencies
+
 v0.4.1
 ------
 
