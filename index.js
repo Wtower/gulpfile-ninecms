@@ -297,7 +297,7 @@ var taskMethods = {
       }))
       .pipe(ngHtml2Js({
         moduleName: function (file) {
-          var pathParts = file.path.split('/');
+          var pathParts = file.path.split(path.sep);
           var folder = pathParts[pathParts.length - 2];
           return folder.replace(/-[a-z]/g, function (match) {
             return match.substr(1).toUpperCase();
