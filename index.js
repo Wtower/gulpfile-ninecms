@@ -23,7 +23,7 @@ var watchify = require('watchify');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
-var uglify = require('gulp-uglify');
+var uglify = require('gulp-uglify-es').default;
 // partials
 var minifyHtml = require('gulp-minify-html');
 var ngHtml2Js = require('gulp-ng-html2js');
@@ -191,7 +191,7 @@ var taskMethods = {
       .pipe(gulpif(!production, sourcemaps.init()))
       .on('error', handleError('JS'))
       .pipe(concat('index.min.js'))
-      .pipe(gulpif(production, uglify({preserveComments: 'license', mangle: false})))
+      .pipe(gulpif(production, uglify({mangle: false})))
       .pipe(sourcemaps.write())
       .pipe(gulp.dest(paths.build + 'js/'));
   },
