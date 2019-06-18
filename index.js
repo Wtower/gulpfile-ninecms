@@ -75,7 +75,7 @@ var taskMethods = {
    * Delete build folder
    */
   clean: function (paths) {
-    return del([paths.build]);
+    return del([paths.build], {force: true});
   },
 
   /*
